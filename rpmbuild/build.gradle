@@ -23,7 +23,7 @@ ospackage {
     release = 1
     def prefixPath = "/opt/${packageName}"
     def fullPath = "${goPath}/${packageSrcPath}"
-    def binFile = "${goPath}/bin/batler{ .Project.Name }"
+    def binFile = "${goPath}/bin/butler{ .Project.Name }"
     def initScript = "${fullPath}/${packageName}.init"
 
     println("Go Path => ${goPath}")
