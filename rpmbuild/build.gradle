@@ -1,0 +1,50 @@
+def packageName = rootProject.name
+def goPath = project.ext.goPath
+def packageSrcPath = project.ext.packageSrcPath
+def packageVersion = project.ext.packageVersion
+
+buildscript {
+   repositories {
+      mavenCentral()
+   }
+
+   dependencies {
+      classpath "com.netflix.nebula:gradle-ospackage-plugin:4.3.0"
+   }
+}
+
+apply plugin: 'nebula.ospackage'
+
+ospackage {
+    packageName = "${packageName}"
+    version = "${packageVersion}"
+    arch = NOARCH
+    os = LINUX
+    release = 1
+    def prefixPath = "/opt/${packageName}"
+    def fullPath = "${goPath}/${packageSrcPath}"
+    def binFile = "${goPath}/bin/batler{ .Project.Name }"
+    def initScript = "${fullPath}/${packageName}.init"
+
+    println("Go Path => ${goPath}")
+    println("Build rpm => ${packageName}-${version}")
+
+    into "${prefixPath}"
+
+    println("Copy binary file => ${binFile} to rpm:${prefixPath}/bin")
+    from(binFile) {
+       into 'bin'
+       rename { String fileName -> packageName}
+       fileMode 755
+    }
+    
+    println("Copy init script => ${initScript} to rpm:${prefixPath}/bin")
+    from(initScript) {
+       into 'bin'
+       fileMode 755
+    }
+    
+}
+
+buildRpm {
+}

@@ -1,0 +1,6 @@
+templates:
+  - name: skeleton
+    url: https://github.com/THE108/go-skeleton.git
+
+variables:
+  useKafka: true
