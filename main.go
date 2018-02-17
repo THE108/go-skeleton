@@ -18,7 +18,7 @@ import (
 // Variables values set during compile time (see Makefile)
 var (
 	// Application name
-	AppName = "batler{ .Project.Name }"
+	AppName = batler{ .Project.Name }
 	// AppVersion application version
 	AppVersion string
 	// GoVersion GO version that used to build application
