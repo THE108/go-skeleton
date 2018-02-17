@@ -6,7 +6,7 @@ const (
 	BuildDate  = "BuildDate"
 	GitLog     = "GitLog"
 
-	butler{if eq .Vars.useKafka}
+	butler{if .Vars.useKafka}
 	KafkaNodes = "KafkaNodes"
 	butler{end}
 )

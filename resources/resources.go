@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/THE108/go-skeleton/config"
 
-	butler{if eq .Vars.useKafka}
+	butler{if .Vars.useKafka}
 	"strings"
 	"github.com/THE108/go-skeleton/resources/kafka"
 	butler{end}
@@ -12,7 +12,7 @@ import (
 type Resources struct {
 	cfg *config.Config
 
-	butler{if eq .Vars.useKafka}
+	butler{if .Vars.useKafka}
 	kafkaClient kafka.Broker
 	butler{end}
 }
@@ -22,7 +22,7 @@ func InitResources(cfg *config.Config) (*Resources, error) {
 		cfg: cfg,
 	}
 
-	butler{if eq .Vars.useKafka}
+	butler{if .Vars.useKafka}
 	nodesString, err := cfg.GetString(config.KafkaNodes)
 	if err != nil {
 		return nil, err
