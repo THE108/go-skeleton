@@ -8,11 +8,11 @@ import (
 	"os/signal"
 	"fmt"
 
-	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/config"
-	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/resources"
-	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/app"
-	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/log"
-	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/monitoring"
+	"butler{ .Vars.repoPath }/butler{ .Project.Name }/config"
+	"butler{ .Vars.repoPath }/butler{ .Project.Name }/resources"
+	"butler{ .Vars.repoPath }/butler{ .Project.Name }/app"
+	"butler{ .Vars.repoPath }/butler{ .Project.Name }/log"
+	"butler{ .Vars.repoPath }/butler{ .Project.Name }/monitoring"
 )
 
 // Variables values set during compile time (see Makefile)
@@ -38,7 +38,7 @@ func main() {
 	flag.Parse()
 
 	if showVersionAndExit {
-		fmt.Printf("%s version: %s go: %s build: %s git: %s", AppName, AppVersion, GoVersion, BuildDate, GitLog)
+		fmt.Printf("%s - butler{ .Project.Description }\nversion: %s go: %s build: %s git: %s", AppName, AppVersion, GoVersion, BuildDate, GitLog)
 		return
 	}
 
