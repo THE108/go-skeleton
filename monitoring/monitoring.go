@@ -31,3 +31,6 @@ func (m *Monitoring) UpdateGauge(metricName string, value int64) {
 func (m *Monitoring) GetMetric(metricName string) interface{}  {
 	return metrics.Get(metricName)
 }
+
+func (m *Monitoring) DeregisterMetric(metricName string) {
+}
