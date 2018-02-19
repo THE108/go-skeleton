@@ -3,4 +3,5 @@ templates:
     url: https://github.com/THE108/go-skeleton.git
 
 variables:
+  repoPath: stash.eyeota.com/tsuk
   useKafka: true

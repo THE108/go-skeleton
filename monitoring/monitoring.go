@@ -16,6 +16,18 @@ func NewMonitoring() *Monitoring {
 	}
 }
 
-func (m *Monitoring) ObserveDuration(metricName string, startTime  time.Time) {
-	metrics.GetOrRegisterHistogram(metricName, nil, m.sample).Update(time.Since(startTime).Nanoseconds() / 1e6)
+func (m *Monitoring) Mark(metricName string, value int64) {
+	metrics.GetOrRegisterMeter(metricName, nil).Mark(value)
+}
+
+func (m *Monitoring) UpdateTimer(metricName string, duration time.Duration) {
+	metrics.GetOrRegisterHistogram(metricName, nil, m.sample).Update(duration.Nanoseconds() / 1e6)
+}
+
+func (m *Monitoring) UpdateGauge(metricName string, value int64) {
+	metrics.GetOrRegisterGauge(metricName, nil).Update(value)
+}
+
+func (m *Monitoring) GetMetric(metricName string) interface{}  {
+	return metrics.Get(metricName)
 }

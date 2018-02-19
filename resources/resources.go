@@ -1,11 +1,11 @@
 package resources
 
 import (
-	"github.com/THE108/go-skeleton/config"
+	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/config"
 
 	butler{if .Vars.useKafka}
 	"strings"
-	"github.com/THE108/go-skeleton/resources/kafka"
+	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/resources/kafka"
 	butler{end}
 )
 

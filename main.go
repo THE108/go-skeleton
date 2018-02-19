@@ -8,11 +8,11 @@ import (
 	"os/signal"
 	"fmt"
 
-	"github.com/THE108/go-skeleton/config"
-	"github.com/THE108/go-skeleton/resources"
-	"github.com/THE108/go-skeleton/app"
-	"github.com/THE108/go-skeleton/log"
-	"github.com/THE108/go-skeleton/monitoring"
+	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/config"
+	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/resources"
+	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/app"
+	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/log"
+	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/monitoring"
 )
 
 // Variables values set during compile time (see Makefile)

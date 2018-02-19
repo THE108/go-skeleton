@@ -3,7 +3,7 @@ package app
 import (
 	"time"
 
-	"github.com/THE108/go-skeleton/resources"
+	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/resources"
 
 	"go.uber.org/zap/zapcore"
 )
@@ -53,7 +53,11 @@ type Logger interface {
 }
 
 type Monitoring interface {
-	ObserveDuration(metricName string, startTime  time.Time)
+	Mark(metricName string, value int64)
+	UpdateTimer(metricName string, duration time.Duration)
+	UpdateGauge(metricName string, value int64)
+	GetMetric(metricName string) interface{}
+	DeregisterMetric(metricName string)
 }
 
 // Hook called by skeleton
