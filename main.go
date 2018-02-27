@@ -62,20 +62,30 @@ func main() {
 		return
 	}
 
-	logger.Info("Start application")
-	if err := app.Run(cfg, logger, mon, res); err != nil {
-		fmt.Println(err)
-		return
-	}
+	quitCh := make(chan struct{})
+
+	go func() {
+		defer close(quitCh)
+
+		logger.Info("Start application")
+		if err := app.Run(cfg, logger, mon, res); err != nil {
+			fmt.Println(err)
+		}
+	}()
 
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
-	for s := range ch {
-		switch s {
-		case syscall.SIGINT, syscall.SIGTERM:
-			signal.Stop(ch)
-			app.Shutdown()
-			logger.Info("Shutdown application")
+	for {
+		select {
+		case s := <-ch:
+			switch s {
+			case syscall.SIGINT, syscall.SIGTERM:
+				signal.Stop(ch)
+				app.Shutdown()
+				logger.Info("Shutdown application")
+			}
+
+		case <-quitCh:
 			return
 		}
 	}
