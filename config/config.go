@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"encoding/json"
 	"io/ioutil"
+	"strings"
 )
 
 type Config struct {
@@ -86,6 +87,27 @@ func (c *Config) GetString(key string, defaults ...string) (string, error) {
 
 	if v, ok := value.(string); ok {
 		return v, nil
+	}
+
+	return defaultValue, errors.New("can't cast interface to string")
+}
+
+func (c *Config) GetStrings(key string, defaults ...string) ([]string, error) {
+	value, err := c.getValue(key, func(val string) (interface{}, error) {
+		return val, nil
+	})
+
+	var defaultValue []string
+	if len(defaults) > 0 {
+		defaultValue = defaults
+	}
+
+	if err != nil {
+		return defaultValue, err
+	}
+
+	if v, ok := value.(string); ok {
+		return strings.Split(v, ","), nil
 	}
 
 	return defaultValue, errors.New("can't cast interface to string")

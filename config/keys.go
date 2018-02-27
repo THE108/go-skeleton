@@ -8,5 +8,7 @@ const (
 
 	butler{if .Vars.useKafka}
 	KafkaNodes = "KafkaNodes"
+	KafkaCounsumerGroup = "KafkaCounsumerGroup"
+	KafkaTopics = "KafkaTopics"
 	butler{end}
 )
