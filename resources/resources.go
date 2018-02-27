@@ -5,12 +5,13 @@ import (
 
 	butler{if .Vars.useKafka}
 	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/resources/kafka"
+	"github.com/bsm/sarama-cluster"
 	butler{end}
 )
 
 type Resources struct {
 	butler{if .Vars.useKafka}
-	kafkaClient kafka.Broker
+	kafkaConsumer *cluster.Consumer
 	butler{end}
 }
 
@@ -18,7 +19,7 @@ func InitResources(cfg *config.Config) (res *Resources, err error) {
 	res = new(Resources)
 
 	butler{if .Vars.useKafka}
-	res.kafkaClient, err = kafka.New(cfg)
+	res.kafkaConsumer, err = kafka.New(cfg)
 	if err != nil {
 		return nil, err
 	}
