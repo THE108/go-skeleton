@@ -14,10 +14,8 @@ type Resources struct {
 	butler{end}
 }
 
-func InitResources(cfg *config.Config) (*Resources, error) {
-	res := &Resources{
-		cfg: cfg,
-	}
+func InitResources(cfg *config.Config) (res *Resources, err error) {
+	res = new(Resources)
 
 	butler{if .Vars.useKafka}
 	res.kafkaClient, err = kafka.New(cfg)
