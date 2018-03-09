@@ -13,60 +13,44 @@ type Logger struct {
 
 // NewLogger returns new Logger instance
 func NewLogger() (*Logger, error) {
-	logger, err := zap.NewProduction()
+	cfg := zap.NewProductionConfig()
+	cfg.Encoding = "console"
+	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+
+	logger, err := cfg.Build(
+		zap.AddCallerSkip(1),
+		zap.AddStacktrace(zapcore.PanicLevel),
+		//zap.Fields(),
+		//zap.Hooks(),
+	)
+
 	if err != nil {
 		return nil, err
 	}
 
 	return &Logger{
-		logger: logger,
+		logger:        logger,
 		sugaredLogger: logger.Sugar(),
 	}, nil
 }
 
-// Structured logging (optimized)
-func (l *Logger) Debug(msg string, fields ...zapcore.Field) {
-	l.logger.Debug(msg, fields...)
-}
-
-func (l *Logger) Info(msg string, fields ...zapcore.Field) {
-	l.logger.Info(msg, fields...)
-}
-
-func (l *Logger) Error(msg string, fields ...zapcore.Field) {
-	l.logger.Error(msg, fields...)
+func (l *Logger) Close() error {
+	return l.logger.Sync()
 }
 
 // Structured logging (empty interfaces)
-func (l *Logger) Debugw(msg string, keysAndValues ...interface{}) {
+func (l *Logger) Debug(msg string, keysAndValues ...interface{}) {
 	l.sugaredLogger.Debugw(msg, keysAndValues...)
 }
 
-func (l *Logger) Infow(msg string, keysAndValues ...interface{}) {
+func (l *Logger) Info(msg string, keysAndValues ...interface{}) {
 	l.sugaredLogger.Infow(msg, keysAndValues...)
 }
 
-func (l *Logger) Errorw(msg string, keysAndValues ...interface{}) {
+func (l *Logger) Error(msg string, keysAndValues ...interface{}) {
 	l.sugaredLogger.Errorw(msg, keysAndValues...)
 }
 
-// Formatted logging
-func (l *Logger) Debugf(format string, args ...interface{}) {
-	l.sugaredLogger.Debugf(format, args...)
-}
-
-func (l *Logger) Infof(format string, args ...interface{}) {
-	l.sugaredLogger.Infof(format, args...)
-}
-
-func (l *Logger) Errorf(format string, args ...interface{}) {
-	l.sugaredLogger.Errorf(format, args...)
-}
-
-func (l *Logger) IsDebugEnabled() bool     { return l.levelEqualsTo(zapcore.DebugLevel) }
-func (l *Logger) IsInfoEnabled() bool      { return l.levelEqualsTo(zapcore.InfoLevel) }
-func (l *Logger) IsErrorEnabled() bool     { return l.levelEqualsTo(zapcore.ErrorLevel) }
-
-func (l *Logger) levelEqualsTo(level zapcore.Level) bool {
-	return l.logger.Core().Enabled(level)
-}
+func (l *Logger) IsDebugEnabled() bool { return l.logger.Core().Enabled(zapcore.DebugLevel) }
+func (l *Logger) IsInfoEnabled() bool  { return l.logger.Core().Enabled(zapcore.InfoLevel) }
+func (l *Logger) IsErrorEnabled() bool { return l.logger.Core().Enabled(zapcore.ErrorLevel) }

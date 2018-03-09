@@ -2,20 +2,25 @@ package config
 
 import (
 	"errors"
-	"fmt"
-	"strconv"
 	"encoding/json"
 	"io/ioutil"
 	"strings"
+
+	"github.com/BurntSushi/toml"
+)
+
+var (
+	ErrorNotFound     = errors.New("config key not found")
+	ErrorTypeMismatch = errors.New("config value type mismatch")
 )
 
 type Config struct {
-	data map[string]string
+	data map[string]interface{}
 }
 
 func Parse(filename, appVersion, goVersion, buildDate, gitLog string) (*Config, error) {
 	cfg := &Config{
-		data: make(map[string]string),
+		data: make(map[string]interface{}),
 	}
 
 	if err := cfg.parseConfigFile(filename); err != nil {
@@ -36,167 +41,172 @@ func (c *Config) parseConfigFile(filename string) error {
 		return err
 	}
 
-	return json.Unmarshal(content, &c.data)
+	switch {
+	case strings.HasSuffix(filename, "json"):
+		err = json.Unmarshal(content, &c.data)
+	case strings.HasSuffix(filename, "toml"):
+		_, err = toml.Decode(string(content), &c.data)
+	}
+
+	return err
 }
 
-func (c *Config) getValue(key string, parse func(string) (interface{}, error)) (interface{}, error) {
-	value, found := c.data[key]
+func (c *Config) getValue(key string) (interface{}, bool) {
+	return getValueTree(strings.Split(key, "."), c.data)
+}
+
+func getValueTree(tree []string, data map[string]interface{}) (interface{}, bool) {
+	if len(tree) == 0 {
+		return nil, false
+	}
+
+	value, found := data[tree[0]]
 	if !found {
-		return "", fmt.Errorf("can't find a key in config. key: %q", key)
+		return nil, false
 	}
 
-	return parse(value)
+	if len(tree) == 1 {
+		return value, true
+	}
+
+	if mapValue, ok := value.(map[string]interface{}); ok {
+		return getValueTree(tree[1:], mapValue)
+	}
+
+	return nil, false
 }
 
-// GetBool returns config value by key as bool
-func (c *Config) GetBool(key string, defaults ...bool) (bool, error) {
-	value, err := c.getValue(key, func(val string) (interface{}, error) {
-		return strconv.ParseBool(val)
-	})
+butler{ range .Vars.types }
+type T{{.}} {{.}}
+{end}
 
-	var defaultValue bool
-	if len(defaults) > 0 {
-		defaultValue = defaults[0]
+func (c *Config) GetStrings(key string, defaults ...string) (result []string, err error) {
+	value, found := c.getValue(key)
+	if !found {
+		if len(defaults) > 0 {
+			result = defaults
+			return
+		}
+
+		err = ErrorNotFound
+		return
 	}
 
-	if err != nil {
-		return defaultValue, err
+	if v, ok := value.([]string); ok {
+		result = v
+		return
 	}
 
-	if v, ok := value.(bool); ok {
-		return v, nil
-	}
-
-	return defaultValue, errors.New("can't cast interface to bool")
-}
-
-// GetString returns config value by key as string
-func (c *Config) GetString(key string, defaults ...string) (string, error) {
-	value, err := c.getValue(key, func(val string) (interface{}, error) {
-		return val, nil
-	})
-
-	var defaultValue string
-	if len(defaults) > 0 {
-		defaultValue = defaults[0]
-	}
-
-	if err != nil {
-		return defaultValue, err
-	}
-
-	if v, ok := value.(string); ok {
-		return v, nil
-	}
-
-	return defaultValue, errors.New("can't cast interface to string")
-}
-
-func (c *Config) GetStrings(key string, defaults ...string) ([]string, error) {
-	value, err := c.getValue(key, func(val string) (interface{}, error) {
-		return val, nil
-	})
-
-	var defaultValue []string
-	if len(defaults) > 0 {
-		defaultValue = defaults
-	}
-
-	if err != nil {
-		return defaultValue, err
-	}
-
-	if v, ok := value.(string); ok {
-		return strings.Split(v, ","), nil
-	}
-
-	return defaultValue, errors.New("can't cast interface to string")
+	err = ErrorTypeMismatch
+	return
 }
 
 // GetInt returns config value by key as int
-func (c *Config) GetInt(key string, defaults ...int) (int, error) {
-	value, err := c.getValue(key, func(val string) (interface{}, error) {
-		return strconv.Atoi(val)
-	})
+func (c *Config) GetInt(key string, defaults ...int) (result int, err error) {
+	value, found := c.getValue(key)
+	if !found {
+		if len(defaults) > 0 {
+			result = defaults[0]
+			return
+		}
 
-	var defaultValue int
-	if len(defaults) > 0 {
-		defaultValue = defaults[0]
-	}
-
-	if err != nil {
-		return defaultValue, err
+		err = ErrorNotFound
+		return
 	}
 
 	if v, ok := value.(int); ok {
-		return v, nil
+		result = v
+		return
 	}
 
-	return defaultValue, errors.New("can't cast interface to int")
+	err = ErrorTypeMismatch
+	return
 }
 
-// GetInt64 returns config value by key as int
-func (c *Config) GetInt64(key string, defaults ...int64) (int64, error) {
-	value, err := c.getValue(key, func(val string) (interface{}, error) {
-		return strconv.ParseInt(val, 10, 64)
-	})
+// GetString returns config value by key as string
+func (c *Config) GetString(key string, defaults ...string) (result string, err error) {
+	value, found := c.getValue(key)
+	if !found {
+		if len(defaults) > 0 {
+			result = defaults[0]
+			return
+		}
 
-	var defaultValue int64
-	if len(defaults) > 0 {
-		defaultValue = defaults[0]
+		err = ErrorNotFound
+		return
 	}
 
-	if err != nil {
-		return defaultValue, err
+	if v, ok := value.(string); ok {
+		result = v
+		return
+	}
+
+	err = ErrorTypeMismatch
+	return
+}
+
+// GetInt64 returns config value by key as int64
+func (c *Config) GetInt64(key string, defaults ...int64) (result int64, err error) {
+	value, found := c.getValue(key)
+	if !found {
+		if len(defaults) > 0 {
+			result = defaults[0]
+			return
+		}
+
+		err = ErrorNotFound
+		return
 	}
 
 	if v, ok := value.(int64); ok {
-		return v, nil
+		result = v
+		return
 	}
 
-	return defaultValue, errors.New("can't cast interface to int64")
+	err = ErrorTypeMismatch
+	return
 }
 
 // GetUint64 returns config value by key as uint64
-func (c *Config) GetUint64(key string, defaults ...uint64) (uint64, error) {
-	value, err := c.getValue(key, func(val string) (interface{}, error) {
-		return strconv.ParseUint(val, 10, 64)
-	})
+func (c *Config) GetUint64(key string, defaults ...uint64) (result uint64, err error) {
+	value, found := c.getValue(key)
+	if !found {
+		if len(defaults) > 0 {
+			result = defaults[0]
+			return
+		}
 
-	var defaultValue uint64
-	if len(defaults) > 0 {
-		defaultValue = defaults[0]
-	}
-
-	if err != nil {
-		return defaultValue, err
+		err = ErrorNotFound
+		return
 	}
 
 	if v, ok := value.(uint64); ok {
-		return v, nil
+		result = v
+		return
 	}
 
-	return defaultValue, errors.New("can't cast interface to uint64")
+	err = ErrorTypeMismatch
+	return
 }
 
-// GetFloat64 returns config value by given key as float64
-func (c *Config) GetFloat64(key string, defaults ...float64) (float64, error) {
-	value, err := c.getValue(key, func(val string) (interface{}, error) {
-		return strconv.ParseFloat(val, 64)
-	})
+// GetFloat64 returns config value by key as float64
+func (c *Config) GetFloat64(key string, defaults ...float64) (result float64, err error) {
+	value, found := c.getValue(key)
+	if !found {
+		if len(defaults) > 0 {
+			result = defaults[0]
+			return
+		}
 
-	var defaultValue float64
-	if len(defaults) > 0 {
-		defaultValue = defaults[0]
-	}
-
-	if err != nil {
-		return defaultValue, err
+		err = ErrorNotFound
+		return
 	}
 
 	if v, ok := value.(float64); ok {
-		return v, nil
+		result = v
+		return
 	}
 
-	return defaultValue, errors.New("can't cast interface to float64")
+	err = ErrorTypeMismatch
+	return
 }

@@ -86,6 +86,10 @@ func main() {
 			}
 
 		case <-quitCh:
+			if err := logger.Close(); err != nil {
+				fmt.Printf("Couldn't close close logger. error: %s", err)
+			}
+
 			return
 		}
 	}

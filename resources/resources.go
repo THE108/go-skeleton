@@ -25,5 +25,9 @@ func InitResources(cfg *config.Config) (res *Resources, err error) {
 	}
 	butler{end}
 
+	butler{if .Vars.usePostgres}
+	// ...
+	butler{end}
+
 	return res, nil
 }

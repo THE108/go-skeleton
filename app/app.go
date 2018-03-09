@@ -1,11 +1,8 @@
 package app
 
 import (
-	"time"
-
 	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/resources"
-
-	"go.uber.org/zap/zapcore"
+	"butler{ .Vars.repoPath }/butler{ toSnakeCase .Project.Name }/interfaces"
 )
 
 type Application struct{}
@@ -24,45 +21,9 @@ func (a *Application) stop() {
 
 var a = NewApplication()
 
-// Interfaces are standardised
-type Config interface {
-	GetString(key string, defaults ...string) (string, error)
-	GetBool(key string, defaults ...bool) (bool, error)
-	GetInt(key string, defaults ...int) (int, error)
-	GetInt64(key string, defaults ...int64) (int64, error)
-	GetUint64(key string, defaults ...uint64) (uint64, error)
-	GetFloat64(key string, defaults ...float64) (float64, error)
-}
-
-type Logger interface {
-	Debug(msg string, fields ...zapcore.Field)
-	Info(msg string, fields ...zapcore.Field)
-	Error(msg string, fields ...zapcore.Field)
-
-	Debugw(msg string, keysAndValues ...interface{})
-	Infow(msg string, keysAndValues ...interface{})
-	Errorw(msg string, keysAndValues ...interface{})
-
-	Debugf(format string, args ...interface{})
-	Infof(format string, args ...interface{})
-	Errorf(format string, args ...interface{})
-
-	IsDebugEnabled() bool
-	IsInfoEnabled() bool
-	IsErrorEnabled() bool
-}
-
-type Monitoring interface {
-	Mark(metricName string, value int64)
-	UpdateTimer(metricName string, duration time.Duration)
-	UpdateGauge(metricName string, value int64)
-	GetMetric(metricName string) interface{}
-	DeregisterMetric(metricName string)
-}
-
 // Hook called by skeleton
 // Signature of that func is standardised
-func Run(cfg Config, logger Logger, mon Monitoring, res *resources.Resources) error {
+func Run(cfg interfaces.Config, logger interfaces.Logger, mon interfaces.Monitoring, res *resources.Resources) error {
 	// here user's code goes...
 	return a.doStaff()
 }
