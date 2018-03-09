@@ -7,3 +7,9 @@ lag = 123
 [cassandra]
 hosts = ["host1", "host2"]
 keyspace = "test"
+
+[tree]
+    [tree.lvl1]
+    key = "val1"
+        [tree.lvl1.lvl2]
+        key = "val2"

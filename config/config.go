@@ -9,6 +9,13 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+const (
+	AppVersion = "AppVersion"
+	GoVersion  = "GoVersion"
+	BuildDate  = "BuildDate"
+	GitLog     = "GitLog"
+)
+
 var (
 	ErrorNotFound     = errors.New("config key not found")
 	ErrorTypeMismatch = errors.New("config value type mismatch")
@@ -88,8 +95,17 @@ func (c *Config) GetStrings(key string, defaults ...string) (result []string, er
 		return
 	}
 
-	if v, ok := value.([]string); ok {
-		result = v
+	if v, ok := value.([]interface{}); ok {
+		result = make([]string, 0, len(v))
+		for _, ifc := range v {
+			str, ok := ifc.(string)
+			if !ok {
+				err = ErrorTypeMismatch
+				return
+			}
+
+			result = append(result, str)
+		}
 		return
 	}
 
