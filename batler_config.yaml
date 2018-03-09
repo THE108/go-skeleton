@@ -7,5 +7,7 @@ variables:
   useKafka: true
   types:
     - int
+    - int64
+    - uint64
     - string
     - float64

@@ -76,10 +76,6 @@ func getValueTree(tree []string, data map[string]interface{}) (interface{}, bool
 	return nil, false
 }
 
-butler{ range .Vars.types }
-type Tbutler{.} butler{.}
-butler{end}
-
 func (c *Config) GetStrings(key string, defaults ...string) (result []string, err error) {
 	value, found := c.getValue(key)
 	if !found {
@@ -101,8 +97,9 @@ func (c *Config) GetStrings(key string, defaults ...string) (result []string, er
 	return
 }
 
-// GetInt returns config value by key as int
-func (c *Config) GetInt(key string, defaults ...int) (result int, err error) {
+butler{ range .Vars.types }
+// Getbutler{ toPascalCase . } returns config value by key as butler{ . }
+func (c *Config) Getbutler{ toPascalCase . }(key string, defaults ...butler{ . }) (result butler{ . }, err error) {
 	value, found := c.getValue(key)
 	if !found {
 		if len(defaults) > 0 {
@@ -114,7 +111,7 @@ func (c *Config) GetInt(key string, defaults ...int) (result int, err error) {
 		return
 	}
 
-	if v, ok := value.(int); ok {
+	if v, ok := value.(butler{ . }); ok {
 		result = v
 		return
 	}
@@ -122,91 +119,4 @@ func (c *Config) GetInt(key string, defaults ...int) (result int, err error) {
 	err = ErrorTypeMismatch
 	return
 }
-
-// GetString returns config value by key as string
-func (c *Config) GetString(key string, defaults ...string) (result string, err error) {
-	value, found := c.getValue(key)
-	if !found {
-		if len(defaults) > 0 {
-			result = defaults[0]
-			return
-		}
-
-		err = ErrorNotFound
-		return
-	}
-
-	if v, ok := value.(string); ok {
-		result = v
-		return
-	}
-
-	err = ErrorTypeMismatch
-	return
-}
-
-// GetInt64 returns config value by key as int64
-func (c *Config) GetInt64(key string, defaults ...int64) (result int64, err error) {
-	value, found := c.getValue(key)
-	if !found {
-		if len(defaults) > 0 {
-			result = defaults[0]
-			return
-		}
-
-		err = ErrorNotFound
-		return
-	}
-
-	if v, ok := value.(int64); ok {
-		result = v
-		return
-	}
-
-	err = ErrorTypeMismatch
-	return
-}
-
-// GetUint64 returns config value by key as uint64
-func (c *Config) GetUint64(key string, defaults ...uint64) (result uint64, err error) {
-	value, found := c.getValue(key)
-	if !found {
-		if len(defaults) > 0 {
-			result = defaults[0]
-			return
-		}
-
-		err = ErrorNotFound
-		return
-	}
-
-	if v, ok := value.(uint64); ok {
-		result = v
-		return
-	}
-
-	err = ErrorTypeMismatch
-	return
-}
-
-// GetFloat64 returns config value by key as float64
-func (c *Config) GetFloat64(key string, defaults ...float64) (result float64, err error) {
-	value, found := c.getValue(key)
-	if !found {
-		if len(defaults) > 0 {
-			result = defaults[0]
-			return
-		}
-
-		err = ErrorNotFound
-		return
-	}
-
-	if v, ok := value.(float64); ok {
-		result = v
-		return
-	}
-
-	err = ErrorTypeMismatch
-	return
-}
+butler{end}
