@@ -77,8 +77,8 @@ func getValueTree(tree []string, data map[string]interface{}) (interface{}, bool
 }
 
 butler{ range .Vars.types }
-type T{{.}} {{.}}
-{end}
+type Tbutler{.} butler{.}
+butler{end}
 
 func (c *Config) GetStrings(key string, defaults ...string) (result []string, err error) {
 	value, found := c.getValue(key)
