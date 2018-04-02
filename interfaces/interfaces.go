@@ -12,6 +12,10 @@ type Config interface {
 	GetFloat64(key string, defaults ...float64) (float64, error)
 }
 
+type ConfigParser interface {
+	Parse(cfg interface{}) error
+}
+
 type Logger interface {
 	Debug(msg string, keysAndValues ...interface{})
 	Info(msg string, keysAndValues ...interface{})
