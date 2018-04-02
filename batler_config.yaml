@@ -11,3 +11,4 @@ variables:
     - uint64
     - string
     - float64
+    - bool
