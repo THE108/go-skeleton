@@ -36,7 +36,7 @@
   name = "github.com/BurntSushi/toml"
   version = "~0.3.0"
 
-{if or .Vars.useKafkaConsumer .Vars.useKafkaProducer}
+butler{if or .Vars.useKafkaConsumer .Vars.useKafkaProducer}
 [[constraint]]
   name = "github.com/Shopify/sarama"
   version = "~1.14.0"
