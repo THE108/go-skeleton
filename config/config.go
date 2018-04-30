@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"butler{ .Project.Name }/butler{ .Project.Name }/monitoring"
+	"butler{ .Vars.repoPath }/butler{ .Project.Name }/monitoring"
 	butler{if .Vars.useKafkaConsumer}
 	"butler{ .Vars.repoPath }/butler{ .Project.Name }/kafka/consumer"
 	butler{end}
