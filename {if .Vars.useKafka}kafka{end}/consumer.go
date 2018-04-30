@@ -1,4 +1,4 @@
-package consumer
+package kafka
 
 import (
 	"log"
@@ -10,14 +10,14 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
-type Config struct {
+type ConsumerConfig struct {
 	ConsumerGroup   string `toml:"consumer_group"`
 	ExtendedLogging bool   `toml:"extended_logging"`
 	Brokers         []string
 	Topics          []string
 }
 
-func NewConsumer(cfg *Config) (*cluster.Consumer, error) {
+func NewConsumer(cfg *ConsumerConfig) (*cluster.Consumer, error) {
 	if cfg.ExtendedLogging {
 		sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
 	}

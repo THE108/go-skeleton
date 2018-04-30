@@ -1,4 +1,4 @@
-package producer
+package kafka
 
 import (
 	"log"
@@ -9,12 +9,12 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
-type Config struct {
+type ProducerConfig struct {
 	Brokers         []string
 	ExtendedLogging bool `toml:"extended_logging"`
 }
 
-func NewProducer(cfg *Config) (sarama.SyncProducer, error) {
+func NewProducer(cfg *ProducerConfig) (sarama.SyncProducer, error) {
 	if cfg.ExtendedLogging {
 		sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
 	}

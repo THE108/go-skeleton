@@ -4,29 +4,24 @@ import (
 	"fmt"
 
 	"butler{ .Vars.repoPath }/butler{ .Project.Name }/monitoring"
-	butler{if .Vars.useKafkaConsumer}
-	"butler{ .Vars.repoPath }/butler{ .Project.Name }/kafka/consumer"
-	butler{end}
-	butler{if .Vars.useKafkaProducer}
-	"butler{ .Vars.repoPath }/butler{ .Project.Name }/kafka/producer"
+	butler{if .Vars.useKafka}
+	"butler{ .Vars.repoPath }/butler{ .Project.Name }/kafka"
 	butler{end}
 
 	"github.com/BurntSushi/toml"
 )
 
 type Config struct {
-	butler{if .Vars.useKafkaConsumer}
-	KafkaConsumer consumer.Config `toml:"kafka_consumer"`
-	butler{end}
-	butler{if .Vars.useKafkaProducer}
-	KafkaProducer producer.Config `toml:"kafka_producer"`
+	butler{if .Vars.useKafka}
+	KafkaConsumer consumer.ConsumerConfig `toml:"kafka_consumer"`
+	KafkaProducer producer.ProducerConfig `toml:"kafka_producer"`
 	butler{end}
 
 	Monitoring monitoring.Config
 }
 
 func (cfg *Config) applyDefaultsAndValidate() error {
-	butler{if .Vars.useKafkaConsumer}
+	butler{if .Vars.useKafka}
 	if cfg.KafkaConsumer.ConsumerGroup == "" {
 		return fmt.Errorf("kafka consumer group must be not empty")
 	}
@@ -38,9 +33,7 @@ func (cfg *Config) applyDefaultsAndValidate() error {
 	if len(cfg.KafkaConsumer.Brokers) == 0 {
 		return fmt.Errorf("kafka brockers list must be not empty")
 	}
-	butler{end}
 
-	butler{if .Vars.useKafkaProducer}
 	if len(cfg.KafkaProducer.Brokers) == 0 {
 		return fmt.Errorf("kafka brockers list must be not empty")
 	}

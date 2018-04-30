@@ -4,5 +4,5 @@ templates:
 
 variables:
   repoPath: stash.eyeota.com/tsuk
-  useKafkaConsumer: true
+  useKafka: true
   useCassandra: true
