@@ -13,8 +13,8 @@ import (
 
 type Config struct {
 	butler{if .Vars.useKafka}
-	KafkaConsumer consumer.ConsumerConfig `toml:"kafka_consumer"`
-	KafkaProducer producer.ProducerConfig `toml:"kafka_producer"`
+	KafkaConsumer kafka.ConsumerConfig `toml:"kafka_consumer"`
+	KafkaProducer kafka.ProducerConfig `toml:"kafka_producer"`
 	butler{end}
 
 	Monitoring monitoring.Config
