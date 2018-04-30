@@ -5,10 +5,3 @@ templates:
 variables:
   repoPath: stash.eyeota.com/tsuk
   useKafka: true
-  types:
-    - int
-    - int64
-    - uint64
-    - string
-    - float64
-    - bool

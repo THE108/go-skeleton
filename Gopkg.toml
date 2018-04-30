@@ -24,13 +24,27 @@
 #   go-tests = true
 #   unused-packages = true
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/cyberdelia/go-metrics-graphite"
 
 [[constraint]]
-  name = "go.uber.org/zap"
-  version = "1.7.1"
-
-[[constraint]]
+  branch = "master"
   name = "github.com/rcrowley/go-metrics"
+
+[[constraint]]
+  name = "github.com/BurntSushi/toml"
+  version = "~0.3.0"
+
+{if .Vars.useKafkaConsumer||.Vars.useKafkaProducer}kafka{end}
+[[constraint]]
+  name = "github.com/Shopify/sarama"
+  version = "~1.14.0"
+
+[[constraint]]
+  name = "github.com/bsm/sarama-cluster"
+  version = "~2.1.10"
+butler{end}
 
 [prune]
   go-tests = true

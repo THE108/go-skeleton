@@ -2,57 +2,33 @@ package config
 
 import (
 	"testing"
+
+	. "gopkg.in/check.v1"
 )
 
-func TestParse(t *testing.T) {
-	cfg, err := Parse("testdata/config.toml", "1.0.0", "1.10", "now", "git")
-	if err != nil {
-		t.Errorf("couldn't parse config.toml")
-		return
-	}
+func Test(t *testing.T) {
+	TestingT(t)
+}
 
-	counsumergroup, err := cfg.GetString("kafka.counsumergroup")
-	if err != nil {
-		t.Errorf("couldn't get string")
-	}
+type configSuite struct{}
 
-	if counsumergroup != "consgrp" {
-		t.Errorf("counsumergroup != 'consgrp'")
-	}
+var _ = Suite(&configSuite{})
 
-	lvl1, err := cfg.GetString("tree.lvl1.key")
-	if err != nil {
-		t.Errorf("couldn't get string")
-	}
+func (s configSuite) Test(c *C) {
+	cfg, err := Parse("testdata/config.toml")
 
-	if lvl1 != "val1" {
-		t.Errorf("lvl1 != 'val'")
-	}
+	c.Assert(err, IsNil)
 
-	lvl2, err := cfg.GetString("tree.lvl1.lvl2.key")
-	if err != nil {
-		t.Errorf("couldn't get string")
-	}
+	butler{if .Vars.useKafkaConsumer}
+	c.Assert(cfg.KafkaConsumer.ConsumerGroup, Equals, "kafkaproxy")
+	c.Assert(cfg.KafkaConsumer.Topics, DeepEquals, []string{"topic1", "topic2"})
+	c.Assert(cfg.KafkaConsumer.Brokers, DeepEquals, []string{"localhost:9092"})
+	butler{end}
 
-	if lvl2 != "val2" {
-		t.Errorf("lvl1 != 'val'")
-	}
+	butler{if .Vars.useKafkaProducer}
+	c.Assert(cfg.KafkaProducer.Brokers, DeepEquals, []string{"localhost:9092"})
+	butler{end}
 
-	kafkaLag, err := cfg.GetInt64("kafka.lag")
-	if err != nil {
-		t.Errorf("couldn't get int")
-	}
-
-	if kafkaLag != 123 {
-		t.Errorf("kafkaLag != 123")
-	}
-
-	topics, err := cfg.GetStrings("kafka.topics")
-	if err != nil {
-		t.Errorf("couldn't get strings")
-	}
-
-	if len(topics) != 2 || topics[0] != "topic1" || topics[1] != "topic2" {
-		t.Errorf("len(topics) != 2 || topics[0] != 'topic1' || topics[1] != 'topic2'")
-	}
+	c.Assert(cfg.Monitoring.Server, Equals, "localhost:2005")
+	c.Assert(cfg.Monitoring.Prefix, Equals, "test")
 }

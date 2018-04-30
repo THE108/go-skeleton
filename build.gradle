@@ -1,4 +1,4 @@
-def packageName = rootProject.name
+def packageName = "butler{ .Project.Name }"
 def goPath = project.ext.goPath
 def packageSrcPath = project.ext.packageSrcPath
 def packageVersion = project.ext.packageVersion

@@ -1,0 +1,15 @@
+[Unit]
+Description=butler{ .Project.Description }
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/butler{ .Project.Name }/bin/butler{ .Project.Name } -config /opt/butler{ .Project.Name }/conf/config.toml
+Restart=on-abort
+LimitNOFILE=49152
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=butler{ .Project.Name }
+
+[Install]
+WantedBy=multi-user.target

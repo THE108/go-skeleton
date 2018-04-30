@@ -1,15 +1,20 @@
-[kafka]
-brokers = ["host1", "host2"]
-counsumergroup = "consgrp"
+[kafka_consumer]
+consumer_group = "kafkaproxy"
+extended_logging = true
+brokers = ["localhost:9092"]
 topics = ["topic1", "topic2"]
-lag = 123
+
+[kafka_producer]
+# Extended logging for Kafka client
+extended_logging = true
+
+# The comma-separated list of brokers in the Kafka cluster
+brokers = ["localhost:9092"]
 
 [cassandra]
 hosts = ["host1", "host2"]
 keyspace = "test"
 
-[tree]
-    [tree.lvl1]
-    key = "val1"
-        [tree.lvl1.lvl2]
-        key = "val2"
+[monitoring]
+server = "localhost:2005"
+prefix = "test"

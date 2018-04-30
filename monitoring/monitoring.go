@@ -1,37 +1,46 @@
 package monitoring
 
 import (
+	"errors"
+	"log"
+	"net"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
 )
 
-type Monitoring struct {
-	sample metrics.Sample
+type Config struct {
+	Server string
+	Prefix string
 }
 
-func NewMonitoring() *Monitoring {
-	return &Monitoring{
-		sample: metrics.NewExpDecaySample(1028, 0.015),
+func InitMonitoring(cfg *Config) {
+	metrics.RegisterDebugGCStats(metrics.DefaultRegistry)
+	metrics.RegisterRuntimeMemStats(metrics.DefaultRegistry)
+	go metrics.CaptureDebugGCStats(metrics.DefaultRegistry, time.Minute)
+	go metrics.CaptureRuntimeMemStats(metrics.DefaultRegistry, time.Minute)
+
+	if err := startGraphite(cfg); err != nil {
+		log.Print("Error starting Graphite client", err)
+
+		go metrics.Log(metrics.DefaultRegistry, 5*time.Second, log.New(os.Stderr, "metrics: ", log.Lmicroseconds))
 	}
 }
 
-func (m *Monitoring) Mark(metricName string, value int64) {
-	metrics.GetOrRegisterMeter(metricName, nil).Mark(value)
-}
+func startGraphite(cfg *Config) error {
+	server := strings.TrimSpace(cfg.Server)
+	if server == "" {
+		return errors.New("empty graphite server address")
+	}
 
-func (m *Monitoring) UpdateTimer(metricName string, duration time.Duration) {
-	metrics.GetOrRegisterHistogram(metricName, nil, m.sample).Update(duration.Nanoseconds() / 1e6)
-}
+	addr, err := net.ResolveTCPAddr("tcp", server)
+	if err != nil {
+		return err
+	}
 
-func (m *Monitoring) UpdateGauge(metricName string, value int64) {
-	metrics.GetOrRegisterGauge(metricName, nil).Update(value)
-}
+	go graphite.Graphite(metrics.DefaultRegistry, time.Minute, cfg.Prefix, addr)
 
-func (m *Monitoring) GetMetric(metricName string) interface{}  {
-	return metrics.Get(metricName)
-}
-
-func (m *Monitoring) UnregisterMetric(metricName string) {
-	metrics.Unregister(metricName)
+	return nil
 }

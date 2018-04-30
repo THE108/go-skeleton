@@ -1,138 +1,63 @@
 package config
 
 import (
-	"errors"
-	"encoding/json"
-	"io/ioutil"
-	"strings"
+	"fmt"
+
+	"butler{ .Project.Name }/butler{ .Project.Name }/monitoring"
+	butler{if .Vars.useKafkaConsumer}
+	"butler{ .Vars.repoPath }/butler{ .Project.Name }/kafka/consumer"
+	butler{end}
+	butler{if .Vars.useKafkaProducer}
+	"butler{ .Vars.repoPath }/butler{ .Project.Name }/kafka/producer"
+	butler{end}
 
 	"github.com/BurntSushi/toml"
 )
 
-const (
-	AppVersion = "AppVersion"
-	GoVersion  = "GoVersion"
-	BuildDate  = "BuildDate"
-	GitLog     = "GitLog"
-)
-
-var (
-	ErrorNotFound     = errors.New("config key not found")
-	ErrorTypeMismatch = errors.New("config value type mismatch")
-)
-
 type Config struct {
-	data map[string]interface{}
+	butler{if .Vars.useKafkaConsumer}
+	KafkaConsumer consumer.Config `toml:"kafka_consumer"`
+	butler{end}
+	butler{if .Vars.useKafkaProducer}
+	KafkaProducer producer.Config `toml:"kafka_producer"`
+	butler{end}
+
+	Monitoring monitoring.Config
 }
 
-func Parse(filename, appVersion, goVersion, buildDate, gitLog string) (*Config, error) {
-	cfg := &Config{
-		data: make(map[string]interface{}),
+func (cfg *Config) applyDefaultsAndValidate() error {
+	butler{if .Vars.useKafkaConsumer}
+	if cfg.KafkaConsumer.ConsumerGroup == "" {
+		return fmt.Errorf("kafka consumer group must be not empty")
 	}
 
-	if err := cfg.parseConfigFile(filename); err != nil {
+	if len(cfg.KafkaConsumer.Topics) == 0 {
+		return fmt.Errorf("kafka topics list must be not empty")
+	}
+
+	if len(cfg.KafkaConsumer.Brokers) == 0 {
+		return fmt.Errorf("kafka brockers list must be not empty")
+	}
+	butler{end}
+
+	butler{if .Vars.useKafkaProducer}
+	if len(cfg.KafkaProducer.Brokers) == 0 {
+		return fmt.Errorf("kafka brockers list must be not empty")
+	}
+	butler{end}
+
+	return nil
+}
+
+func Parse(file string) (*Config, error) {
+	var conf Config
+	if _, err := toml.DecodeFile(file, &conf); err != nil {
 		return nil, err
 	}
 
-	cfg.data[AppVersion] = appVersion
-	cfg.data[GoVersion] = goVersion
-	cfg.data[BuildDate] = buildDate
-	cfg.data[GitLog] = gitLog
+	if err := conf.applyDefaultsAndValidate(); err != nil {
+		return nil, err
+	}
 
-	return cfg, nil
+	return &conf, nil
 }
-
-func (c *Config) parseConfigFile(filename string) error {
-	content, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return err
-	}
-
-	switch {
-	case strings.HasSuffix(filename, "json"):
-		err = json.Unmarshal(content, &c.data)
-	case strings.HasSuffix(filename, "toml"):
-		_, err = toml.Decode(string(content), &c.data)
-	}
-
-	return err
-}
-
-func (c *Config) getValue(key string) (interface{}, bool) {
-	return getValueTree(strings.Split(key, "."), c.data)
-}
-
-func getValueTree(tree []string, data map[string]interface{}) (interface{}, bool) {
-	if len(tree) == 0 {
-		return nil, false
-	}
-
-	value, found := data[tree[0]]
-	if !found {
-		return nil, false
-	}
-
-	if len(tree) == 1 {
-		return value, true
-	}
-
-	if mapValue, ok := value.(map[string]interface{}); ok {
-		return getValueTree(tree[1:], mapValue)
-	}
-
-	return nil, false
-}
-
-func (c *Config) GetStrings(key string, defaults ...string) (result []string, err error) {
-	value, found := c.getValue(key)
-	if !found {
-		if len(defaults) > 0 {
-			result = defaults
-			return
-		}
-
-		err = ErrorNotFound
-		return
-	}
-
-	if v, ok := value.([]interface{}); ok {
-		result = make([]string, 0, len(v))
-		for _, ifc := range v {
-			str, ok := ifc.(string)
-			if !ok {
-				err = ErrorTypeMismatch
-				return
-			}
-
-			result = append(result, str)
-		}
-		return
-	}
-
-	err = ErrorTypeMismatch
-	return
-}
-
-butler{ range .Vars.types }
-// Getbutler{ toPascalCase . } returns config value by key as butler{ . }
-func (c *Config) Getbutler{ toPascalCase . }(key string, defaults ...butler{ . }) (result butler{ . }, err error) {
-	value, found := c.getValue(key)
-	if !found {
-		if len(defaults) > 0 {
-			result = defaults[0]
-			return
-		}
-
-		err = ErrorNotFound
-		return
-	}
-
-	if v, ok := value.(butler{ . }); ok {
-		result = v
-		return
-	}
-
-	err = ErrorTypeMismatch
-	return
-}
-butler{end}
