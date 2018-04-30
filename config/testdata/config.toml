@@ -1,3 +1,4 @@
+butler{if .Vars.useKafka}
 [kafka_consumer]
 consumer_group = "kafkaproxy"
 extended_logging = true
@@ -10,6 +11,7 @@ extended_logging = true
 
 # The comma-separated list of brokers in the Kafka cluster
 brokers = ["localhost:9092"]
+butler{end}
 
 [cassandra]
 hosts = ["host1", "host2"]
