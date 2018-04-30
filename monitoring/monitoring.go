@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cyberdelia/go-metrics-graphite"
 	"github.com/rcrowley/go-metrics"
 )
 
