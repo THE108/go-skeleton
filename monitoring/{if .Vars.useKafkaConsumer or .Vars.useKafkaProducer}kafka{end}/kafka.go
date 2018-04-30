@@ -1,4 +1,4 @@
-package _if__Vars_useKafkaConsumer___Vars_useKafkaProducer_kafka_end_
+package kafka
 
 import (
 	"sync"
