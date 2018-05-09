@@ -6,11 +6,13 @@ import (
 
 // Sample application
 type Application struct {
+	cfg *config.Config
 	quit chan struct{}
 }
 
 func NewApplication(cfg *config.Config) *Application {
 	return &Application{
+		cfg: cfg,
 		quit: make(chan struct{}),
 	}
 }

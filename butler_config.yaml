@@ -6,3 +6,4 @@ variables:
   repoPath: stash.eyeota.com/tsuk
   useKafka: true
   useCassandra: true
+  usePostgres: true

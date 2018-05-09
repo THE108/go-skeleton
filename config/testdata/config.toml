@@ -1,6 +1,6 @@
 butler{if .Vars.useKafka}
 [kafka_consumer]
-consumer_group = "kafkaproxy"
+consumer_group = "test"
 extended_logging = true
 brokers = ["localhost:9092"]
 topics = ["topic1", "topic2"]
@@ -13,9 +13,16 @@ extended_logging = true
 brokers = ["localhost:9092"]
 butler{end}
 
+butler{if .Vars.useCassandra}
 [cassandra]
 hosts = ["host1", "host2"]
 keyspace = "test"
+butler{end}
+
+butler{if .Vars.usePostgres}
+[postgres]
+url = "postgres://postgres@host:5432/db"
+butler{end}
 
 [monitoring]
 server = "localhost:2005"

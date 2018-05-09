@@ -13,6 +13,10 @@ import (
 	"butler{ .Vars.repoPath }/butler{ .Project.Name }/cassandra"
 	butler{end}
 
+	butler{if .Vars.usePostgres}
+	"butler{ .Vars.repoPath }/butler{ .Project.Name }/postgres"
+	butler{end}
+
 	"github.com/BurntSushi/toml"
 )
 
@@ -25,7 +29,11 @@ type Config struct {
 	butler{end}
 
 	butler{if .Vars.useCassandra}
-	Cassandra cassandra.Config `toml:"cassandra"`
+	Cassandra cassandra.Config
+	butler{end}
+
+	butler{if .Vars.usePostgres}
+	Postgres postgres.Config
 	butler{end}
 }
 
@@ -63,6 +71,12 @@ func (cfg *Config) applyDefaultsAndValidate() error {
 
 	if cfg.Cassandra.Keyspace == "" {
 		return fmt.Errorf("cassandra keyspace must be not empty")
+	}
+	butler{end}
+
+	butler{if .Vars.usePostgres}
+	if cfg.Postgres.Url == "" {
+		return fmt.Errorf("postgres url must be not empty")
 	}
 	butler{end}
 

@@ -20,10 +20,19 @@ func (s configSuite) Test(c *C) {
 	c.Assert(err, IsNil)
 
 	butler{if .Vars.useKafka}
-	c.Assert(cfg.KafkaConsumer.ConsumerGroup, Equals, "kafkaproxy")
+	c.Assert(cfg.KafkaConsumer.ConsumerGroup, Equals, "test")
 	c.Assert(cfg.KafkaConsumer.Topics, DeepEquals, []string{"topic1", "topic2"})
 	c.Assert(cfg.KafkaConsumer.Brokers, DeepEquals, []string{"localhost:9092"})
 	c.Assert(cfg.KafkaProducer.Brokers, DeepEquals, []string{"localhost:9092"})
+	butler{end}
+
+	butler{if .Vars.useCassandra}
+	c.Assert(cfg.Cassandra.Hosts, DeepEquals, []string{"host1", "host2"})
+	c.Assert(cfg.Cassandra.Keyspace, Equals, "test")
+	butler{end}
+
+	butler{if .Vars.usePostgres}
+	c.Assert(cfg.Postgres.Url, Equals, "postgres://postgres@host:5432/db")
 	butler{end}
 
 	c.Assert(cfg.Monitoring.Server, Equals, "localhost:2005")
