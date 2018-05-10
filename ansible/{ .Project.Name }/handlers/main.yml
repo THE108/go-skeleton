@@ -1,0 +1,3 @@
+---
+- name: restart butler{ .Project.Name }
+  service: name=butler{ .Project.Name } state=restarted

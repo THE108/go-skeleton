@@ -1,0 +1,35 @@
+---
+- name: Install
+  yum: name=butler{ .Project.Name } state=latest
+  tags: butler{ .Project.Name }
+  notify: restart butler{ .Project.Name }
+
+- name: Create dirs
+  file: path={{ item }} state=directory
+  with_items:
+    - /opt/butler{ .Project.Name }/conf
+    - /opt/butler{ .Project.Name }/logs
+    - /opt/butler{ .Project.Name }/bin
+
+- name: Copy files
+  copy: src={{ item.src }} dest={{ item.dest }} owner=root
+  notify: restart butler{ .Project.Name }
+  with_items:
+    - { src: 'logrotate.butler{ .Project.Name }', dest: '/etc/logrotate.d/butler{ .Project.Name }' }
+    - { src: 'butler{ .Project.Name }.init', dest: '/opt/butler{ .Project.Name }/bin/butler{ .Project.Name }.init' }
+    - { src: 'butler{ .Project.Name }.service', dest: '/etc/systemd/system/butler{ .Project.Name }.service' }
+
+- name: Set the SELinux security context for logs folder for logrotate permissions
+  command: /usr/bin/chcon -t var_log_t /opt/butler{ .Project.Name }/logs
+
+- name: Update config
+  template: src=config.toml.j2 dest=/opt/butler{ .Project.Name }/conf/config.toml
+  tags: butler{ .Project.Name }
+  notify: restart butler{ .Project.Name }
+
+- name: Reload systemd if init files changes
+  command: systemctl daemon-reload
+  when: ansible_distribution_major_version == "7" and matchtable_inits|changed
+
+- name: Restart items
+  service: name=butler{ .Project.Name } state=restarted enabled=yes

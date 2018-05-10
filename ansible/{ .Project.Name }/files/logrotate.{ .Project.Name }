@@ -1,0 +1,12 @@
+/opt/butler{ .Project.Name }/logs/*.log {
+        compress
+        copytruncate
+        daily
+        delaycompress
+        dateext
+        dateyesterday
+        ifempty
+        maxage 15
+        maxsize 100M
+        sharedscripts
+}

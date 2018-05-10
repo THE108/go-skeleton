@@ -7,31 +7,31 @@ import (
 )
 
 type Monitoring struct {
-	requestRate        metrics.Meter
-	requestErrorRate   metrics.Meter
-	requestLatency     metrics.Timer
+	rate      metrics.Meter
+	errorRate metrics.Meter
+	latency   metrics.Timer
 }
 
-func NewMonitoring() *Monitoring {
+func NewMonitoring(prefix string) *Monitoring {
 	m := &Monitoring{
-		requestRate:      metrics.NewMeter(),
-		requestErrorRate: metrics.NewMeter(),
-		requestLatency:   metrics.NewTimer(),
+		rate:      metrics.NewMeter(),
+		errorRate: metrics.NewMeter(),
+		latency:   metrics.NewTimer(),
 	}
 
-	metrics.Register("request_rate", m.requestRate)
-	metrics.Register("request_error_rate", m.requestErrorRate)
-	metrics.Register("request_latency", m.requestLatency)
+	metrics.Register(prefix + "_rate", m.rate)
+	metrics.Register(prefix + "_error_rate", m.errorRate)
+	metrics.Register(prefix + "_latency", m.latency)
 
 	return m
 }
 
 func (m *Monitoring) MarkRequest(success bool, elapsed time.Duration) {
 	if success {
-		m.requestRate.Mark(1)
+		m.rate.Mark(1)
 	} else {
-		m.requestErrorRate.Mark(1)
+		m.errorRate.Mark(1)
 	}
 
-	m.requestLatency.Update(elapsed)
+	m.latency.Update(elapsed)
 }

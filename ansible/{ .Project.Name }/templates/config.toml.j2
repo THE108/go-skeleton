@@ -1,0 +1,36 @@
+butler{if .Vars.useKafka}
+{% set kafka_hosts = groups['tag_role_kafka'] | intersect(groups["tag_region_"+ansible_ec2_placement_region]) %}
+
+[kafka_consumer]
+extended_logging = true
+consumer_group = "butler{ .Project.Name }"
+brokers = [{% for host in kafka_hosts %}{% if loop.index != 1 %},{% endif %}"{{ hostvars[host]['ansible_default_ipv4']['address']}}:9092"{% endfor %}]
+topics = []
+
+[kafka_producer]
+# Extended logging for Kafka client
+extended_logging = true
+
+# The comma-separated list of brokers in the Kafka cluster
+brokers = [{% for host in kafka_hosts %}{% if loop.index != 1 %},{% endif %}"{{ hostvars[host]['ansible_default_ipv4']['address']}}:9092"{% endfor %}]
+butler{end}
+
+butler{if .Vars.useCassandra}
+{% cassandra_hosts = groups['tag_role_cassandra'] | intersect(groups["tag_region_"+ansible_ec2_placement_region]) %}
+
+[cassandra]
+hosts = ["{% for host in cassandra_hosts %}{% if loop.index != 1 %}", "{% endif %}{{ hostvars[host].ansible_default_ipv4.address }}{% endfor %}"]
+keyspace = "butler{ .Project.Name }"
+butler{end}
+
+butler{if .Vars.usePostgres}
+[postgres]
+url = "postgres://postgres@host:5432/db"
+butler{end}
+
+[monitoring]
+# graphite server address
+server = "127.0.0.1:2005"
+
+# graphite prefix
+prefix = "butler{ .Project.Name }.{{ region_short }}_{{ ansible_default_ipv4.address | regex_replace("\.","_") }}.butler{ .Project.Name }"

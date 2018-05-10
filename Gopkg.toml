@@ -46,6 +46,12 @@ butler{if .Vars.useKafka}
   version = "~2.1.10"
 butler{end}
 
+butler{if .Vars.usePostgres}
+[[constraint]]
+  branch = "master"
+  name = "github.com/jmoiron/sqlx"
+butler{end}
+
 [prune]
   go-tests = true
   unused-packages = true
