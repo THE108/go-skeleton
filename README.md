@@ -11,7 +11,7 @@ See [here](https://github.com/netzkern/butler#usage)
 Usage
 =====
 
-1. Configure:
+####1. Configure:
 
 Create a `butler.yml` file in your working dir. See more options [here](https://github.com/netzkern/butler/blob/master/docs/config.md#config-places)
 
@@ -32,12 +32,12 @@ variables:
 
 `use*` - specify `true` if needed component must be generated (now supported: `kafka`, `cassandra` and `postgresql`)
 
-2. Run `butler`:
+####2. Run `butler`:
 ```
 $ butler
 ```
 
-3. Go through the wizard's steps:
+####3. Go through the wizard's steps:
  - Create a new project
  - Specify a project name
  - Provide a description
