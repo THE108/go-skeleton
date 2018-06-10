@@ -16,7 +16,7 @@ Usage
 Create a `butler.yml` file in your working dir. See more options [here](https://github.com/netzkern/butler/blob/master/docs/config.md#config-places)
 
 Example:
-```
+```yaml
 templates:
   - name: skeleton
     url: https://github.com/THE108/go-skeleton.git
@@ -38,7 +38,7 @@ Now supported:
  - `postgresql`
 
 #### 2. Run `butler`:
-```
+```bash
 $ butler
 ```
 
