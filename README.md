@@ -1,6 +1,8 @@
-# Go project skeleton :skull:
+# Go project skeleton
 
 Go project skeleton template with [Butler](https://github.com/netzkern/butler).
+
+![gopher skull](https://orig00.deviantart.net/514e/f/2012/128/7/5/gopher_skull_by_mycroftvalentine-d4z0qct.jpg)
 
 ## Installation
 
