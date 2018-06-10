@@ -30,7 +30,7 @@ variables:
 
 `repoPath` - path for the repo you want to create (i.e `$GOPATH/src/your-org`)
 
-`use*` - specify `true` if needed component must be generated (now supported: `kafka`, `cassandra` and `postgresql`)
+`use*` - specify `true` if the needed component must be generated (now supported: `kafka`, `cassandra` and `postgresql`)
 
 #### 2. Run `butler`:
 ```
