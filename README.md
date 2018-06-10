@@ -1,15 +1,12 @@
-Go project skeleton
--------------------
+# Go project skeleton :skull:
 
 Go project skeleton template with [Butler](https://github.com/netzkern/butler).
 
-Installation
-============
+## Installation
 
 See [here](https://github.com/netzkern/butler#usage)
 
-Usage
-=====
+## Usage
 
 #### 1. Configure:
 
@@ -50,6 +47,6 @@ $ butler
  - Press `y`
  - Enjoy!
 
-LICENCE
-=======
+## LICENCE
+
 MIT
