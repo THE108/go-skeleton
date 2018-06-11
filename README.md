@@ -27,7 +27,7 @@ variables:
   usePostgres: true
 ```
 
-`repoPath` - path for the repo you want to create (i.e `$GOPATH/src/your-org`)
+`repoPath` - path for the repo you want to create (i.e `$GOPATH/src`)
 
 `use*` - specify `true` if the needed component must be generated
 
@@ -45,7 +45,7 @@ $ butler
  - Create a new project
  - Specify a project name
  - Provide a description
- - Set project destination to your project path (must be `repoPath/your-project-name`, i.e. `$GOPATH/src/your-org/your-project`)
+ - Set project destination to your project path (must be `repoPath/your-project-name`, i.e. `$GOPATH/src/your-project-name`)
  - Press `y`
  - Enjoy!
 
