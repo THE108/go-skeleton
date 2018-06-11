@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 ExecStart=/opt/butler{ .Project.Name }/bin/butler{ .Project.Name } -config /opt/butler{ .Project.Name }/conf/config.toml
-Restart=on-abort
+Restart=on-failure
 LimitNOFILE=49152
 StandardOutput=syslog
 StandardError=syslog
